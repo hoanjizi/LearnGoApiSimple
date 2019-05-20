@@ -1,21 +1,17 @@
 package databases
 
 import (
-	"github.com/gocql/gocql"
+	"context"
 	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func ConnectToDatabase() (error , *gocql.Session,*gocql.KeyspaceMetadata) {
-	cluster := gocql.NewCluster("127.0.0.1")
-	// cluster.Authenticator = gocql.PasswordAuthenticator{
-    //     Username: "cassandra",
-    //     Password: "cassandra",
-	// }
-	cluster.Keyspace = "hoan"
-	cluster.Timeout = 5*time.Second
-	cluster.ProtoVersion = 4
-	cluster.Consistency = gocql.Quorum
-	session,err := cluster.CreateSession()
-	keySpaceMeta,_ := session.KeyspaceMetadata("hoan")
-	return err,session,keySpaceMeta
+func ConnectToDatabase() (error, *mongo.Client, context.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://hoanjizi:vanhoan@hoan-ktknh.mongodb.net"))
+
+	return err, client, ctx
 }
